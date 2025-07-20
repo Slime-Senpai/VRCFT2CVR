@@ -37,6 +37,12 @@ public class MainMod : MelonMod
     
     private bool loaded;
     private bool didIntegrate;
+    private bool IsInVR;
+
+    public override void OnInitializeMelon()
+    {
+        IsInVR = Environment.CommandLine.Contains("vr");
+    }
 
     public override void OnUpdate()
     {
@@ -54,7 +60,12 @@ public class MainMod : MelonMod
 
     public override void OnLateUpdate()
     {
-        if(loaded) return;
+        if (loaded) return;
+        if (!Config.EnabledInDesktop && !IsInVR)
+        {
+            optionalUI ??= new OptionalUI();
+            return;
+        }
         Player? localPlayer = GetLocalPlayer();
         if(FaceTrackingManager.Instance == null || EyeTrackingManager.Instance == null || localPlayer == null) return;
         if (Runner.Instance == null)
@@ -142,7 +153,7 @@ public class MainMod : MelonMod
             if(!Config.IntegratedTrackingSupport) NoIntegratedLoad();
             MelonLogger.Msg("Loaded VRCFT2CVR!");
             loaded = true;
-            optionalUI = new OptionalUI();
+            optionalUI ??= new OptionalUI();
         }
     }
 
